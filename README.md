@@ -97,6 +97,12 @@ Several sources mention that the chip has a firmware:
     > I can provide pre-compiled firmware for everyone to download, so this solution is suitable for
     > Direct copy of the project's classmates' reference.
 
+ - Nvidia's driver source code: https://github.com/LineageOS/android_kernel_nvidia_nvidia/blob/b10f76ea6b11022e19457693d37a6d8903f2b0a6/drivers/media/i2c/lt6911uxc.c#L87
+
+    > /* As soon as the reset pin is released, the bridge starts streaming
+
+   This leads me to think that the firmware is the key to making the chip work.
+
 I'd guess that my chip doesn't have any firmware yet. This would explain
 why it didn't do anything by itself. The hardware could still be controlled by a
 sophisticated driver via I2C. However, the data needed for creating that (full register maps
