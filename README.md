@@ -71,13 +71,15 @@ Several sources mention that the chip has a firmware:
 
  - Some article on CSDN: https://blog.csdn.net/TSZ0000/article/details/109182122
 
-  /google translate'd/:
+   /google translate'd/:
+
     > The conversion chip has no firmware by default, the read data is all 0xFF,
     > and the firmware is programmed: LT6911UXC_V2P9_YUV422_20201012_GSW_X2.hex
 
  - README of a project based on the chip: https://github.com/peng-zhihui/HDMI-PI
 
-  /google translate'd/:
+   /google translate'd/:
+
     > There is also a Longxun solution LT6911 made in China. Compared with the above solution,
     > Longxun has a slightly weaker performance, but the chip has a built-in 51-core MCU, so it
     > can be programmed directly on the chip (Toshiba needs an additional single-chip microcomputer
