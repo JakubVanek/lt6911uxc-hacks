@@ -1,0 +1,108 @@
+what do we know:
+ - the register map is split into 256 pages / banks of 256 registers each
+   - bank switch:    i2c wr 0xFF <bank>
+   - register write: i2c wr <addr> <val>
+   - register read:  i2c wr <addr>
+                     i2c rd <byte1> <byte2> ...
+ - register contents are big-endian
+
+Parameters:
+ - min size 160x120 ?
+ - max size 3840x2160
+ - min pixclk 25000000 p/s
+ - max pixclk 297000000 p/s
+ - chip ID = 0x1704
+
+ - FSERIAL_CLK_4_LANE  240000000ULL ??
+ - FSERIAL_CLK_2_LANE  144000000ULL ??
+ - PIX_CLK_4_LANE       60000000ULL ??
+ - PIX_CLK_2_LANE       18000000ULL ??
+ - hblank = 0x128 * (pixel_rate / pixel_clk) ???
+
+
+Registers:
+ - <0xFF> ACTIVE REGISTER BANK
+ - 0x80 CONTROL BANK
+   * 0x8010 DISABLE_WD
+     - exact meaning unknown; disable watchdog?
+     - written to 0 when i2c is reenabled
+     - maybe watchdog reset
+   * 0x80EE I2C ACCESS
+     - bit 0 = allow external I2C access / stop internal MCU
+ - 0x81 MIPI TX CTRL
+   * 0x8100 CHIP ID 1  = 0x17
+   * 0x8101 CHIP ID 2  = 0x04
+   * 0x8102 CHIP ID 3? = ?
+   * 0x811D MIPI_TX_CTRL
+     - 0x00 = off
+     - 0xFB = on
+ - 0x83 ?? clocks ?
+   * 0x83BA I2S DATA gating?
+     - bits 6+5+4 = enable ?DATA
+   * 0x83B6 I2S WS gating?
+     - bits 6+5+4 = enable ?WS
+     - bits 2+1+0 = enable ?SCK
+   * 0x83B7 I2S MCLK gating?
+     - bits 6+5+4 = enable ?MCLK
+ - 0x85 ?? frequency meter?
+   * 0x8540 AD_HALF_PCLK
+     - 0x21 -> half pixel clock?
+     - 0x1B -> byte clock? in kHz
+   * 0x8548 FM1_FREQ_IN2 = freq highest bits (only 0xF valid)
+   * 0x8549 FM1_FREQ_IN1 = freq middle bits
+   * 0x854A FM1_FREQ_IN0 = freq low bits
+     -> needs 10 ms sleep before reading
+   * 0x859f ?
+     - bit 0+1 seem to indicate plugged in HDMI cable
+ - 0x86 MIPI LANE CTRL
+   * 0x8670 u8  SYNC POLARITY
+     - bit 0 = hsync positive polarity
+     - bit 1 = vsync positive polarity
+   * 0x8671 u8  VERT SYNC PIXELS
+   * 0x8672 u16 HORIZ SYNC PIXELS / 2
+   * 0x8674 u8  VERT BACK PORCH PIXELS
+   * 0x8675 u8  VERT FRONT PORCH PIXELS
+   * 0x8676 u16 HORIZ BACK PORCH PIXELS / 2
+   * 0x8678 u16 HORIZ FRONT PORCH PIXELS / 2
+   * 0x867A u16 VERT TOTAL PIXELS
+   * 0x867C u16 HORIZ TOTAL PIXELS / 2
+   * 0x867E u16 VERT ACTIVE PIXELS
+   * 0x8680 u16 HORIZ ACTIVE PIXELS / 2
+   * 0x86A2 MIPI_LANES
+   * 0x86A3 INT_HDMI = HDMI interrupt status code
+     - 0x55 = HDMI stable
+     - 0x88 = HDMI disconnected
+     - other = error
+   * 0x86A5 INT_AUDIO = Audio interrupt status code
+     - 0x88 - audio disconnected
+     - 0x55 - sample rate increased?
+     - 0xAA - sample rate decreased?
+   * 0x86A6 INT_RESPOND
+     - 0x00 - when HDMI gets unplugged
+     - 0x01 - ? (status check?)
+ - 0x87 ? HDMI CLOCK ?
+   - 0x8750 TMDS clock highest bits (mask 0x0F)
+     - bit 4 = clock stable
+   - 0x8751 TMDS clock middle bits
+   - 0x8752 TMDS clock low bits
+ - 0xB0 AUDIO BLOCK
+   * 0xB021 ?? version ??
+   * 0xB032 ?
+     - bit 7 = audio hi=mute, lo=unmute
+   * 0xB081 ? (audio presence register?)
+     - bit 5 = audio presence flag
+   * 0xB0A2 ? (audio status register?)
+     - bit 0 = HDMI 2.0 feature flag
+   * 0xB0AA AUDIO SAMPLE RATE hi?
+   * 0xB0AB AUDIO SAMPLE RATE lo? ~= sample rate [kHz] (approx)
+ - 0xD4 MIPI CLK CTRL
+   * 0xD40E FRAME_ID
+   * 0xD414 FRAME_STATUS
+   * 0xD468 MIPI_CLK_MODE
+
+Pins:
+ - interrupt:
+   - behaviour unknown
+ - reset:
+   - active low
+   - needs (?) 100 ms init & deinit time
